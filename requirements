@@ -1,0 +1,10 @@
+numpy
+plotly
+dash
+librosa
+os
+base64
+io
+scipy
+dash-bootstrap-components
+soundfile

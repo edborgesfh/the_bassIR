@@ -12,10 +12,11 @@ import scipy.signal
 import dash_bootstrap_components as dbc
 import soundfile as sf
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, '/assets/style.css'])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/style.css'])
+server = app.server
 
 # Diretório dos arquivos de áudio
-AUDIO_DIR = 'basslines'
+AUDIO_DIR = 'src/basslines'
 
 # Lista de arquivos de áudio no diretório
 audio_files = [f for f in os.listdir(AUDIO_DIR) if os.path.isfile(os.path.join(AUDIO_DIR, f)) and
@@ -67,12 +68,12 @@ def update_graphs(selected_file, ir_contents, ir_filename):
     audioinfo_children = html.Div([
         html.P('Nenhum áudio selecionado'),
         html.P(''),
-    ], className='tela-div')
+    ], className='looper-div')
 
     irinfo_children = html.Div([
-        html.P('Nenhum IR carregado',
-                       className='audio-info'),
-    ])
+        html.P('Nenhum IR carregado'),
+        html.P(''),
+    ], className='irloader-div')
 
     fig_spectrogram = go.Figure()
     fig_spl = px.line()
@@ -98,8 +99,8 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             # Caracterizar o Div para as infomações do áudio
             audioinfo_children = html.Div([
                 html.P(f'Sample Rate: {sr} Hz'),
-                html.P(f'Duração: {duration:.2f} seg', className='audio-info')
-            ], className='tela-div')
+                html.P(f'Duração: {duration:.2f} seg')
+            ], className='looper-div')
 
             # Converte o áudio para formato base64 para o player
             audio_bytes = io.BytesIO()
@@ -117,7 +118,7 @@ def update_graphs(selected_file, ir_contents, ir_filename):
                           labels={'x': 'Frequência (Hz)', 'y': 'Magnitude (dB Relativo)'})
 
         fig_spl.add_trace(go.Scatter(x=frequencies, y=magnitude_db_relative, mode='lines', name='SLP original',
-                                     line=dict(color='#FFDF00')))
+                                     line=dict(color='#FF5C00')))
 
         fig_spl.update_xaxes(range=[np.log10(20), np.log10(20000)],
                              tickvals=freq_ticks, ticktext=freq_ticks,
@@ -137,7 +138,7 @@ def update_graphs(selected_file, ir_contents, ir_filename):
         decoded = base64.b64decode(content_string)
 
         try:
-            temp_filename = 'temp_ir.wav'
+            temp_filename = '../temp_ir.wav'
             with open(temp_filename, 'wb') as f:
                 f.write(decoded)
 
@@ -158,9 +159,10 @@ def update_graphs(selected_file, ir_contents, ir_filename):
 
             # Caracterizar o Div para as infomações do IR
             irinfo_children = html.Div([
-                html.P(f'{ir_filename}, Sample Rate: {sr_ir} Hz',
-                       className='audio-info'),
-            ])
+                html.P(f'{ir_filename}'),
+                html.P(f'Sample Rate: {sr_ir} Hz'),
+                ], className='irloader-div',
+            )
 
             # Converte o áudio com IR para base64
             ir_audio_bytes = io.BytesIO()
@@ -203,7 +205,7 @@ audioinfo = html.Div(id='audioinfo')
 
 audio_player = html.Div([
     html.Audio(id='audio-player', controls=True, className='audio-looper'),
-    html.Div('bassIR — LOOPSTATION ', className='pedal-nome'),
+    html.Div('bassIR — LOOPSTATION ', className='pedal-looper-nome'),
 ], style={'width': '100%'})
 
 irloader = dcc.Upload(
@@ -216,8 +218,8 @@ irloader = dcc.Upload(
 irinfo = html.Div(id='irinfo')
 
 ir_audio_player = html.Div([
-    html.Audio(id='ir-audio-player', controls=True),
-    html.Div('Áudio com IR', className='audio-info'),
+    html.Audio(id='ir-audio-player', controls=True, className='audio-irloader'),
+    html.Div('bassIR — loader', className='pedal-irloader-nome'),
 ]),
 
 grafico_spl = dcc.Graph(id='spl-graph', ),
@@ -283,19 +285,24 @@ pedal_looper = dbc.Card([
     ]),
 ]),
 
-pedal_irloader = dbc.Row([
-    dbc.Col([
-        dbc.Row(
-            dbc.Col(irloader),
-        ),
+pedal_irloader = dbc.Card([
+    dbc.CardBody([
         dbc.Row([
-            dbc.Col(irinfo),
-        ]),
-        dbc.Row([
-            dbc.Col(ir_audio_player),
-        ])
+            dbc.Col([
+                dbc.Row([
+                    dbc.Col(irloader),
+                ]),
+                dbc.Row([
+                    dbc.Col(irinfo),
+                ]),
+                dbc.Row([
+                    dbc.Col(ir_audio_player),
+                ]),
+            ]),
+        ], className='irloader-cardbody'),
     ]),
-])
+]),
+
 
 # Linhas
 
@@ -306,7 +313,7 @@ linha_titulo = dbc.Row([
 linha_pedais = dbc.Row([
     dbc.Col(pedal_looper, width=4),
     dbc.Col(pedal_irloader, width=4)
-])
+], justify='center')
 
 linha_graficos = html.Div(id='graphs-container', children=[
     dbc.Row([
@@ -334,4 +341,4 @@ app.layout = dbc.Container([
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8067)
