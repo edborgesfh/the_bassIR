@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="Segundo commit&#10;&#10;'atualizações para deploy'">
-      <change beforePath="$PROJECT_DIR$/render.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/render.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-    </list>
+    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="Terceiro commit&#10;&#10;'atualizações para deploy'" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,6 +19,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -50,7 +48,8 @@
     "Python.outro_audioplayer_teste.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main"
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -107,12 +106,21 @@
       <option name="project" value="LOCAL" />
       <updated>1731348652855</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Terceiro commit&#10;&#10;'atualizações para deploy'">
+      <option name="closed" value="true" />
+      <created>1731351800021</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1731351800021</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Segundo commit&#10;&#10;'atualizações para deploy'" />
-    <option name="LAST_COMMIT_MESSAGE" value="Segundo commit&#10;&#10;'atualizações para deploy'" />
+    <MESSAGE value="Terceiro commit&#10;&#10;'atualizações para deploy'" />
+    <option name="LAST_COMMIT_MESSAGE" value="Terceiro commit&#10;&#10;'atualizações para deploy'" />
   </component>
 </project>
