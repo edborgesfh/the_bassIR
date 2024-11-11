@@ -1,0 +1,16 @@
+/* style.css */
+.upload-container {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    borderColor: yellow;
+    text-align: center;
+    margin: 4px;
+}
+
+.upload-container:hover {
+    background-color: #e2e3e5; /* Cor de fundo ao passar o mouse */
+}
