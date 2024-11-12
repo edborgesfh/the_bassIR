@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="'atualizações para deploy'">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/basslines/bass_groove_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/basslines/bass_groove_1.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/basslines/hip-hop_bass_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/basslines/hip-hop_bass_1.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/basslines/slap_bass_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/basslines/slap_bass_1.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/basslines/thunder_bass_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/basslines/thunder_bass_1.wav" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/render.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/render.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +23,9 @@
   <component name="Git.Settings">
     <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/.venv/.gitignore" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -210,7 +209,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731433554271</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="'atualizações para deploy'">
+      <option name="closed" value="true" />
+      <created>1731434989531</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1731434989531</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
