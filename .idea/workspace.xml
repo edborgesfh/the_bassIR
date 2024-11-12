@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="Terceiro commit&#10;&#10;'atualizações para deploy'">
+    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="'atualizações para deploy'">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +148,23 @@
       <option name="project" value="LOCAL" />
       <updated>1731352656791</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Terceiro commit&#10;&#10;'atualizações para deploy'">
+      <option name="closed" value="true" />
+      <created>1731353678490</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1731353678490</updated>
+    </task>
+    <task id="LOCAL-00008" summary="'atualizações para deploy'">
+      <option name="closed" value="true" />
+      <created>1731354152089</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1731354152089</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -167,6 +182,7 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Segundo commit&#10;&#10;'atualizações para deploy'" />
     <MESSAGE value="Terceiro commit&#10;&#10;'atualizações para deploy'" />
-    <option name="LAST_COMMIT_MESSAGE" value="Terceiro commit&#10;&#10;'atualizações para deploy'" />
+    <MESSAGE value="'atualizações para deploy'" />
+    <option name="LAST_COMMIT_MESSAGE" value="'atualizações para deploy'" />
   </component>
 </project>
