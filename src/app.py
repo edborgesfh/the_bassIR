@@ -16,7 +16,9 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/s
 server = app.server
 
 # Lista de arquivos de áudio no diretório
-audio_files = [f for f in os.listdir('src/basslines') if os.path.isfile(os.path.join('src/basslines', f)) and
+AUDIO_DIR = 'basslines'
+
+audio_files = [f for f in os.listdir(AUDIO_DIR) if os.path.isfile(os.path.join(AUDIO_DIR, f)) and
                (f.endswith('.wav') or f.endswith('.mp3'))]
 
 # Labels para as frequências
@@ -79,7 +81,7 @@ def update_graphs(selected_file, ir_contents, ir_filename):
     ir_audio_src = None
 
     if selected_file:
-        filepath = os.path.join('src/basslines', selected_file)
+        filepath = os.path.join(AUDIO_DIR, selected_file)
         try:
             audio_signal, sr = librosa.load(filepath)
             duration = librosa.get_duration(y=audio_signal, sr=sr)
