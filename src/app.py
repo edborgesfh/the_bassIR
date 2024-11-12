@@ -36,14 +36,15 @@ grafico_config = {
     'font_color': '#d3d3d3',
 }
 
-def calculate_db_relative(audio, sr):
+def calculate_db(audio, sr):
     n = len(audio)
     frequencies = np.fft.fftfreq(n, 1/sr)[:n//2]
     yf = np.fft.fft(audio)[:n//2]
     magnitude = np.abs(yf)
     magnitude_db = 20 * np.log10(magnitude/np.max(magnitude))
     magnitude_db_relative = magnitude_db - np.max(magnitude_db)
-    return frequencies, magnitude_db_relative
+    magnitude_db_normal = np.interp(magnitude_db_relative, (-90, 0), (-18, 18))
+    return frequencies, magnitude_db_relative, magnitude_db_normal
 
 @app.callback(
     Output('spectrogram', 'figure'),
@@ -58,7 +59,7 @@ def calculate_db_relative(audio, sr):
     Input('audio-dropdown', 'value'),
     Input('upload-ir', 'contents'),
 
-    State('upload-ir', 'filename')
+    State('upload-ir', 'filename'),
 )
 def update_graphs(selected_file, ir_contents, ir_filename):
     audio_signal = None
@@ -112,25 +113,19 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             print(f'Erro ao carregar o áudio: {e}')
 
     if audio_signal is not None:
-        frequencies, magnitude_db_relative = calculate_db_relative(audio_signal, sr)
+        frequencies, magnitude_db_relative, magnitude_db_normal = calculate_db(audio_signal, sr)
+
         fig_spl = px.line(log_x=True, title='Espectro de Potência',
                           labels={'x': 'Frequência (Hz)', 'y': 'Magnitude (dB Relativo)'})
 
-        fig_spl.add_trace(go.Scatter(x=frequencies, y=magnitude_db_relative, mode='lines', name='SLP original',
-                                     line=dict(color='#FF5C00')))
+        fig_spl.add_trace(go.Scatter(x=frequencies, y=magnitude_db_normal, mode='lines', name='SLP original',
+                                     line=dict(color='#FF5C00'), yaxis='y1'))
 
         fig_spl.update_xaxes(range=[np.log10(20), np.log10(20000)],
                              tickvals=freq_ticks, ticktext=freq_ticks,
                              gridcolor='rgba(255, 255, 255, 0.04)'),
         fig_spl.update_yaxes(gridcolor='rgba(255, 255, 255, 0.04)')
-        fig_spl.update_layout(grafico_config, yaxis_range=[-120, 10])
-
-        # Calcula magnitude_db original
-        n = len(audio_signal)
-        frequencies_original = np.fft.fftfreq(n, 1 / sr)[: n // 2]
-        yf_original = np.fft.fft(audio_signal)[: n // 2]
-        magnitude_original = np.abs(yf_original)
-        magnitude_db_original = 20 * np.log10(magnitude_original)
+        fig_spl.update_layout(grafico_config, yaxis_range=[-18, 18])
 
     if ir_contents:
         content_type, content_string = ir_contents.split(',')
@@ -152,8 +147,8 @@ def update_graphs(selected_file, ir_contents, ir_filename):
                 audio_ir = audio_ir / np.abs(audio_ir).max()
                 audio_signal = audio_signal / np.abs(audio_signal).max()
 
-                frequencies_ir, magnitude_db_relative_ir = calculate_db_relative(audio_ir, sr)
-                fig_spl.add_trace(go.Scatter(x=frequencies_ir, y=magnitude_db_relative_ir,
+                frequencies_ir, magnitude_db_relative_ir, magnitude_db_normal_ir = calculate_db(audio_ir, sr)
+                fig_spl.add_trace(go.Scatter(x=frequencies_ir, y=magnitude_db_normal_ir,
                                              mode='lines', name='SLP com IR', line=dict(color='#FFDF00')))
 
             # Caracterizar o Div para as infomações do IR
