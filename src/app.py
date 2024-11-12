@@ -16,12 +16,11 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/s
 server = app.server
 
 # Diretório dos arquivos de áudio
-AUDIO_DIR = 'src/basslines'
+AUDIO_DIR = 'basslines'
 
 # Lista de arquivos de áudio no diretório
 audio_files = [f for f in os.listdir(AUDIO_DIR) if os.path.isfile(os.path.join(AUDIO_DIR, f)) and
                (f.endswith('.wav') or f.endswith('.mp3'))]
-
 
 # Labels para as frequências
 freq_ticks = [20, 50, 70, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1200,
@@ -226,47 +225,7 @@ grafico_spl = dcc.Graph(id='spl-graph', ),
 
 grafico_spectrogram = dcc.Graph(id='spectrogram')
 
-# app.layout = dbc.Container([
-#         dbc.Row([
-#             dbc.Col(titulo),
-#         ]),
-#
-#         dbc.Row([
-#             dbc.Col(dropaudio),
-#             dbc.Col(irloader),
-#         ]),
-#
-#         dbc.Row([
-#             dbc.Col(audioinfo),
-#             dbc.Col(irinfo)
-#         ]),
-#
-#         dbc.Row([
-#             dbc.Col(audio_player),
-#             dbc.Col(ir_audio_player)
-#         ]),
-#
-#         html.Div(id='graphs-container', children=[
-#             dbc.Row([
-#                 dbc.Col(
-#                     dcc.Loading(
-#                         grafico_spl, color='#FFDF00',
-#                     ),
-#                 )
-#             ]),
-#
-#             dbc.Row([
-#                 dbc.Col(
-#                     dcc.Loading(
-#                         grafico_spectrogram, color='#FFDF00',
-#                     ),
-#                 )
-#             ]),
-#         ], style={'display': 'none'})
-# ])
-
 # Layout dos pedais
-
 pedal_looper = dbc.Card([
     dbc.CardBody([
         dbc.Row([
@@ -305,7 +264,6 @@ pedal_irloader = dbc.Card([
 
 
 # Linhas
-
 linha_titulo = dbc.Row([
     dbc.Col(titulo),
 ])
@@ -338,7 +296,6 @@ app.layout = dbc.Container([
     linha_pedais,
     linha_graficos
 ])
-
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=8067)
