@@ -5,7 +5,6 @@ import dash
 from dash import dcc, html, Input, Output, State
 import librosa
 import librosa.display
-from librosa import feature
 import os
 import base64
 import io
@@ -17,7 +16,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/s
 server = app.server
 
 # Diretório dos arquivos de áudio
-AUDIO_DIR = 'basslines'
+AUDIO_DIR = 'src/basslines'
 
 # Labels para as frequências
 freq_ticks = [20, 50, 70, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1200,
@@ -56,25 +55,12 @@ def load_audio(filepath):
 
 
 # Função para plotar gráfico do Espectrograma
-def create_spectrogram_figure(audio, sr, title, fft_size=2048, hop_size=None, window_size=None):
-    if not window_size:
-        window_size = fft_size
-
-    if not hop_size:
-        hop_size = window_size // 4
-
-    stft = librosa.stft(
-        audio,
-        n_fft=fft_size,
-        hop_length=hop_size,
-        win_length=window_size,
-        center=False,
-    )
+def create_spectrogram_figure(audio, sr):
     stft = librosa.stft(audio)
     spectrogram = np.abs(stft)
     spectrogram_db = librosa.amplitude_to_db(spectrogram)
     fig_spectrogram = go.Figure(data=[go.Heatmap(z=spectrogram_db, colorscale=['#191919', '#FF5C00'])])
-    fig_spectrogram.update_layout(grafico_config, title=title,
+    fig_spectrogram.update_layout(grafico_config, title='Espectrograma',
                                   xaxis_title='Tempo (s)', yaxis_title='Frequência (Hz)')
     return fig_spectrogram
 
@@ -128,7 +114,7 @@ def update_graphs(selected_file, ir_contents, ir_filename):
 
         if audio is not None:
             duration = librosa.get_duration(y=audio, sr=sr)
-            fig_spectrogram = create_spectrogram_figure(audio, sr, f'Espectrograma de {selected_file}')
+            fig_spectrogram = create_spectrogram_figure(audio, sr)
 
             audioinfo_children = html.Div([
                 html.P(f'Sample Rate: {sr} Hz'),
@@ -271,7 +257,7 @@ linha_graficos = html.Div(id='graphs-container', children=[
     dbc.Row([
         dbc.Col(
             dcc.Loading(
-                grafico_spl, color='#FFDF00',
+                grafico_spl, color='#d3d3d3',
             ),
         )
     ]),
@@ -279,7 +265,7 @@ linha_graficos = html.Div(id='graphs-container', children=[
     dbc.Row([
         dbc.Col(
             dcc.Loading(
-                grafico_spectrogram, color='#FFDF00',
+                grafico_spectrogram, color='#d3d3d3',
             ),
         )
     ]),
