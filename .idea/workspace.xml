@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="'atualizações e melhorias'">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Orbitron-Regular.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/Orbitron-Regular.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/basslines/bass_groove_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/src/basslines/bass_groove_1.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/basslines/hip-hop_bass_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/src/basslines/hip-hop_bass_1.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/basslines/slap_bass_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/src/basslines/slap_bass_1.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/basslines/thunder_bass_1.wav" beforeDir="false" afterPath="$PROJECT_DIR$/src/basslines/thunder_bass_1.wav" afterDir="false" />
-    </list>
+    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="'atualizações e melhorias'" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -240,7 +231,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731509738012</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="'atualizações e melhorias'">
+      <option name="closed" value="true" />
+      <created>1731515779931</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1731515779931</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
