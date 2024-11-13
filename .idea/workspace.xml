@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="'atualizações para deploy'">
-      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/render.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/render.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/Orbitron-Regular.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Orbitron-Regular.ttf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +63,7 @@
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR" />
+      <recent name="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR\src\assets" />
       <recent name="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR\src" />
       <recent name="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR\assets" />
     </key>
@@ -79,7 +82,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR\src\app.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR\app.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -217,7 +220,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731434989531</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="'atualizações para deploy'">
+      <option name="closed" value="true" />
+      <created>1731435480391</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1731435480391</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

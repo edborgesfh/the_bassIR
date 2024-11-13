@@ -5,21 +5,19 @@ import dash
 from dash import dcc, html, Input, Output, State
 import librosa
 import librosa.display
+from librosa import feature
 import os
 import base64
 import io
-import scipy.signal
+from scipy.signal import convolve
 import dash_bootstrap_components as dbc
 import soundfile as sf
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/style.css'])
 server = app.server
 
-# Lista de arquivos de áudio no diretório
+# Diretório dos arquivos de áudio
 AUDIO_DIR = 'basslines'
-
-audio_files = [f for f in os.listdir(AUDIO_DIR) if os.path.isfile(os.path.join(AUDIO_DIR, f)) and
-               (f.endswith('.wav') or f.endswith('.mp3'))]
 
 # Labels para as frequências
 freq_ticks = [20, 50, 70, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1200,
@@ -27,7 +25,6 @@ freq_ticks = [20, 50, 70, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1200,
 
 # Estilo do gráfico
 grafico_config = {
-    # 'showlegend': False,
     'plot_bgcolor': 'rgba(0, 0, 0, 0)',
     'paper_bgcolor': 'rgba(0, 0, 0, 0)',
     'margin': {'pad': 0},
@@ -35,6 +32,8 @@ grafico_config = {
     'font_color': '#d3d3d3',
 }
 
+
+# Função para cálculo das variáveis do áudio
 def calculate_db(audio, sr):
     n = len(audio)
     frequencies = np.fft.fftfreq(n, 1/sr)[:n//2]
@@ -45,135 +44,135 @@ def calculate_db(audio, sr):
     magnitude_db_normal = np.interp(magnitude_db_relative, (-90, 0), (-18, 18))
     return frequencies, magnitude_db_relative, magnitude_db_normal
 
+
+# Função para carregamento dos áudios
+def load_audio(filepath):
+    try:
+        audio, sr = librosa.load(filepath)
+        return audio, sr
+    except Exception as e:
+        print(f'Error loading audio: {e}')
+        return None, None
+
+
+# Função para plotar gráfico do Espectrograma
+def create_spectrogram_figure(audio, sr, title, fft_size=2048, hop_size=None, window_size=None):
+    if not window_size:
+        window_size = fft_size
+
+    if not hop_size:
+        hop_size = window_size // 4
+
+    stft = librosa.stft(
+        audio,
+        n_fft=fft_size,
+        hop_length=hop_size,
+        win_length=window_size,
+        center=False,
+    )
+    stft = librosa.stft(audio)
+    spectrogram = np.abs(stft)
+    spectrogram_db = librosa.amplitude_to_db(spectrogram)
+    fig_spectrogram = go.Figure(data=[go.Heatmap(z=spectrogram_db, colorscale=['#191919', '#FF5C00'])])
+    fig_spectrogram.update_layout(grafico_config, title=title,
+                                  xaxis_title='Tempo (s)', yaxis_title='Frequência (Hz)')
+    return fig_spectrogram
+
+
+# Função para plotar gráfico do SPL
+def create_spl_figure(frequencies, magnitude_db_relative, name, color):
+    fig_spl = px.line(log_x=True, title='Espectro de Potência',
+                      labels={'x': 'Frequência (Hz)', 'y': 'Magnitude (dB Relative)'})
+    fig_spl.add_trace(go.Scatter(x=frequencies, y=magnitude_db_relative, mode='lines', name=name, line=dict(color=color)))
+    fig_spl.update_xaxes(range=[np.log10(20), np.log10(20000)],
+                         tickvals=freq_ticks, ticktext=freq_ticks,
+                         gridcolor='rgba(255, 255, 255, 0.04)')
+    fig_spl.update_yaxes(gridcolor='rgba(255, 255, 255, 0.04)')
+    fig_spl.update_layout(grafico_config, yaxis_range=[-120, 0])
+    return fig_spl
+
+
+# Função para decodificação do áudio
+def audio_to_base64(audio, sr):
+    audio_bytes = io.BytesIO()
+    sf.write(audio_bytes, audio, sr, format='WAV')
+    audio_bytes.seek(0)
+    audio_base64 = base64.b64encode(audio_bytes.read()).decode('ascii')
+    return f'data:audio/wav;base64,{audio_base64}'
+
+
+# Callback principal
 @app.callback(
     Output('spectrogram', 'figure'),
     Output('spl-graph', 'figure'),
-
     Output('audioinfo', 'children'),
     Output('irinfo', 'children'),
-
     Output('audio-player', 'src'),
     Output('ir-audio-player', 'src'),
-
     Input('audio-dropdown', 'value'),
     Input('upload-ir', 'contents'),
-
     State('upload-ir', 'filename'),
 )
 def update_graphs(selected_file, ir_contents, ir_filename):
-    audio_signal = None
-    sr = None
-
-    audioinfo_children = html.Div([
-        html.P('Nenhum áudio selecionado'),
-        html.P(''),
-    ], className='looper-div')
-
-    irinfo_children = html.Div([
-        html.P('Nenhum IR carregado'),
-        html.P(''),
-    ], className='irloader-div')
-
+    audio, sr = None, None
     fig_spectrogram = go.Figure()
     fig_spl = px.line()
+    audio_src, ir_audio_src = None, None
 
-    audio_src = None
-    ir_audio_src = None
+    audioinfo_children = html.Div([html.P('No audio selected')], className='looper-div')
+    irinfo_children = html.Div([html.P('No IR uploaded')], className='irloader-div')
 
     if selected_file:
         filepath = os.path.join(AUDIO_DIR, selected_file)
-        try:
-            audio_signal, sr = librosa.load(filepath)
-            duration = librosa.get_duration(y=audio_signal, sr=sr)
+        audio, sr = load_audio(filepath)
 
-            # Calcula o espectrograma
-            S = librosa.feature.melspectrogram(y=audio_signal, sr=sr)
-            S_dB = librosa.power_to_db(S, ref=np.max)
-            fig_spectrogram = go.Figure(data=[go.Heatmap(z=S_dB, colorscale=['#191919', '#FF5C00'])])
-            fig_spectrogram.update_layout(grafico_config,
-                                          title=f'Espectrograma de {selected_file}',
-                                          xaxis_title='Tempo (s)',
-                                          yaxis_title='Frequência (Hz)')
+        if audio is not None:
+            duration = librosa.get_duration(y=audio, sr=sr)
+            fig_spectrogram = create_spectrogram_figure(audio, sr, f'Espectrograma de {selected_file}')
 
-            # Caracterizar o Div para as infomações do áudio
             audioinfo_children = html.Div([
                 html.P(f'Sample Rate: {sr} Hz'),
-                html.P(f'Duração: {duration:.2f} seg')
+                html.P(f'Duração: {duration:.2f} sec')
             ], className='looper-div')
 
-            # Converte o áudio para formato base64 para o player
-            audio_bytes = io.BytesIO()
-            sf.write(audio_bytes, audio_signal, sr, format='WAV')
-            audio_bytes.seek(0)
-            audio_base64 = base64.b64encode(audio_bytes.read()).decode('ascii')
-            audio_src = f'data:audio/wav;base64,{audio_base64}'
+            audio_src = audio_to_base64(audio, sr)
 
-        except Exception as e:
-            print(f'Erro ao carregar o áudio: {e}')
+            frequencies, magnitude_db_relative, magnitude_db_normal = calculate_db(audio, sr)
+            fig_spl = create_spl_figure(frequencies, magnitude_db_relative, 'SPL Original', '#FF5C00')
 
-    if audio_signal is not None:
-        frequencies, magnitude_db_relative, magnitude_db_normal = calculate_db(audio_signal, sr)
-
-        fig_spl = px.line(log_x=True, title='Espectro de Potência',
-                          labels={'x': 'Frequência (Hz)', 'y': 'Magnitude (dB Relativo)'})
-
-        fig_spl.add_trace(go.Scatter(x=frequencies, y=magnitude_db_normal, mode='lines', name='SLP original',
-                                     line=dict(color='#FF5C00'), yaxis='y1'))
-
-        fig_spl.update_xaxes(range=[np.log10(20), np.log10(20000)],
-                             tickvals=freq_ticks, ticktext=freq_ticks,
-                             gridcolor='rgba(255, 255, 255, 0.04)'),
-        fig_spl.update_yaxes(gridcolor='rgba(255, 255, 255, 0.04)')
-        fig_spl.update_layout(grafico_config, yaxis_range=[-18, 18])
-
-    if ir_contents:
+    if ir_contents and audio is not None:  # Process IR only if audio is loaded
         content_type, content_string = ir_contents.split(',')
         decoded = base64.b64decode(content_string)
 
         try:
-            temp_filename = '../temp_ir.wav'
-            with open(temp_filename, 'wb') as f:
-                f.write(decoded)
-
             ir, sr_ir = librosa.load(io.BytesIO(decoded))
-            if audio_signal is not None and sr != sr_ir:
+            if sr != sr_ir:
                 ir = librosa.resample(ir, orig_sr=sr_ir, target_sr=sr)
 
-            if audio_signal is not None:
-                audio_ir = scipy.signal.convolve(audio_signal, ir, mode='same')
+            audio_ir = convolve(audio, ir, mode='same')
+            audio_ir /= np.abs(audio_ir).max()
+            audio /= np.abs(audio).max()
 
-                # Normalização pelo pico
-                audio_ir = audio_ir / np.abs(audio_ir).max()
-                audio_signal = audio_signal / np.abs(audio_signal).max()
+            frequencies_ir, magnitude_db_relative_ir, magnitude_db_normal_ir = calculate_db(audio_ir, sr)
+            fig_spl.add_trace(go.Scatter(x=frequencies_ir, y=magnitude_db_relative_ir,
+                                         mode='lines', name='SPL com IR', line=dict(color='#FFDF00')))
 
-                frequencies_ir, magnitude_db_relative_ir, magnitude_db_normal_ir = calculate_db(audio_ir, sr)
-                fig_spl.add_trace(go.Scatter(x=frequencies_ir, y=magnitude_db_normal_ir,
-                                             mode='lines', name='SLP com IR', line=dict(color='#FFDF00')))
-
-            # Caracterizar o Div para as infomações do IR
             irinfo_children = html.Div([
                 html.P(f'{ir_filename}'),
                 html.P(f'Sample Rate: {sr_ir} Hz'),
-                ], className='irloader-div',
-            )
+            ], className='irloader-div')
 
-            # Converte o áudio com IR para base64
-            ir_audio_bytes = io.BytesIO()
-            sf.write(ir_audio_bytes, audio_ir, sr, format='WAV')  # Use soundfile.write
-            ir_audio_bytes.seek(0)
-            ir_audio_base64 = base64.b64encode(ir_audio_bytes.read()).decode('ascii')
-            ir_audio_src = f'data:audio/wav;base64,{ir_audio_base64}'
+            ir_audio_src = audio_to_base64(audio_ir, sr)
 
         except Exception as e:
-            print(f'Erro ao carregar ou processar a IR: {e}')
+            print(f'Error loading or processing IR: {e}')
 
-    return (fig_spectrogram, fig_spl,
-            audioinfo_children, irinfo_children,
-            audio_src, ir_audio_src,)
+    return fig_spectrogram, fig_spl, audioinfo_children, irinfo_children, audio_src, ir_audio_src
+
 
 # Callback para mostrar/esconder gráficos
 @app.callback(
-    Output('graphs-container', 'style'),   # Output para controlar a visibilidade
+    Output('graphs-container', 'style'),
     Input('audio-dropdown', 'value')
 )
 def show_graphs(selected_file):
@@ -182,17 +181,18 @@ def show_graphs(selected_file):
     else:
         return {'display': 'none'}   # Esconde os gráficos
 
-# Elementos do layout
 
+# Elementos do layout
 titulo = html.H1(children='The_bassIR', className='audio-info'),
 
 dropaudio = dcc.Dropdown(
     id='audio-dropdown',
-    options=[{'label': f, 'value': f} for f in audio_files],
+    options=[{'label': f, 'value': f} for f in os.listdir(AUDIO_DIR) if os.path.isfile(os.path.join(AUDIO_DIR, f))
+             and (f.endswith('.wav') or f.endswith('.mp3'))],
     value=None,
     placeholder='Selecione um arquivo de áudio',
     className='dropdown',
-),
+)
 
 audioinfo = html.Div(id='audioinfo')
 
