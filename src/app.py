@@ -16,7 +16,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/s
 server = app.server
 
 # Diretório dos arquivos de áudio
-AUDIO_DIR = 'src/basslines'
+AUDIO_DIR = 'src/basslines/'
 
 # Labels para as frequências
 freq_ticks = [20, 50, 70, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1200,
