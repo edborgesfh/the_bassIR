@@ -12,12 +12,13 @@ from scipy.signal import convolve
 from plotly.subplots import make_subplots
 import dash_bootstrap_components as dbc
 import soundfile as sf
+from pathlib import Path
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/style.css'])
 server = app.server
 
 # Diretório dos arquivos de áudio
-AUDIO_DIR = 'src/basslines/'
+AUDIO_DIR = Path(__file__).parent / 'basslines'
 
 # Labels para as frequências
 freq_ticks = [20, 50, 70, 100, 150, 250, 500, 1000, 1500, 2000, 3000, 5000, 10000, 15000, 20000]
@@ -195,8 +196,8 @@ titulo = html.H1(children='The_bassIR', className='audio-info'),
 
 dropaudio = dcc.Dropdown(
     id='audio-dropdown',
-    options=[{'label': f, 'value': f} for f in os.listdir(AUDIO_DIR) if os.path.isfile(os.path.join(AUDIO_DIR, f))
-             and (f.endswith('.wav') or f.endswith('.mp3'))],
+    options=[{'label': f.name, 'value': f.name} for f in AUDIO_DIR.iterdir()
+                if f.is_file() and f.suffix in ['.wav', '.mp3']],
     value=None,
     placeholder='Selecione um arquivo de áudio',
     className='dropdown',
