@@ -9,6 +9,7 @@ import os
 import base64
 import io
 from scipy.signal import convolve
+from plotly.subplots import make_subplots
 import dash_bootstrap_components as dbc
 import soundfile as sf
 
@@ -19,8 +20,7 @@ server = app.server
 AUDIO_DIR = 'src/basslines/'
 
 # Labels para as frequências
-freq_ticks = [20, 50, 70, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1200,
-              1500, 2000, 3000, 4000, 5000, 8000, 10000, 12000, 15000, 20000]
+freq_ticks = [20, 50, 70, 100, 150, 250, 500, 1000, 1500, 2000, 3000, 5000, 10000, 15000, 20000]
 
 # Estilo do gráfico
 grafico_config = {
@@ -33,15 +33,28 @@ grafico_config = {
 
 
 # Função para cálculo das variáveis do áudio
-def calculate_db(audio, sr):
-    n = len(audio)
-    frequencies = np.fft.fftfreq(n, 1/sr)[:n//2]
-    yf = np.fft.fft(audio)[:n//2]
-    magnitude = np.abs(yf)
-    magnitude_db = 20 * np.log10(magnitude/np.max(magnitude))
-    magnitude_db_relative = magnitude_db - np.max(magnitude_db)
-    magnitude_db_normal = np.interp(magnitude_db_relative, (-90, 0), (-18, 18))
-    return frequencies, magnitude_db_relative, magnitude_db_normal
+def calculate_db(audio_data_or_filepath, sr, calibration_factor=1.0):
+    if isinstance(audio_data_or_filepath, str):  # Verifica se é um caminho de arquivo
+        y, sr = librosa.load(audio_data_or_filepath)
+    elif isinstance(audio_data_or_filepath, np.ndarray):  # Verifica se são dados de áudio
+        y = audio_data_or_filepath
+    else:
+        raise TypeError("Entrada inválida. Deve ser um caminho de arquivo (str) ou dados de áudio (np.ndarray).")
+
+    n_fft = 2048
+    hop_length = n_fft // 4
+    stft = librosa.stft(y, n_fft=n_fft, hop_length=hop_length)
+
+    power = np.abs(stft)**2
+    ref_power = np.mean(power)
+    relative_spl_db = 10 * np.log10(power / ref_power) + calibration_factor
+
+    freq = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+    magnitude_db = librosa.amplitude_to_db(np.abs(stft), ref=np.max)
+    time = librosa.times_like(magnitude_db, sr=sr, hop_length=hop_length)
+    mean_spl_db = np.mean(relative_spl_db, axis=1)
+
+    return freq, mean_spl_db, stft, magnitude_db, time, sr
 
 
 # Função para carregamento dos áudios
@@ -55,26 +68,30 @@ def load_audio(filepath):
 
 
 # Função para plotar gráfico do Espectrograma
-def create_spectrogram_figure(audio, sr):
-    stft = librosa.stft(audio)
-    spectrogram = np.abs(stft)
-    spectrogram_db = librosa.amplitude_to_db(spectrogram)
-    fig_spectrogram = go.Figure(data=[go.Heatmap(z=spectrogram_db, colorscale=['#191919', '#FF5C00'])])
-    fig_spectrogram.update_layout(grafico_config, title='Espectrograma',
-                                  xaxis_title='Tempo (s)', yaxis_title='Frequência (Hz)')
+def create_spectrogram_figure(magnitude_db, freq, time):
+    fig_spectrogram = px.imshow(magnitude_db,
+                                y=freq, x=time,
+                                color_continuous_scale=['#191919', '#FF5C00'],
+                                aspect='auto', origin='lower',
+                                labels=dict(x="Tempo (s)", y="Frequência (Hz)", color="Magnitude (dB)"),
+                                )
+    fig_spectrogram.update_layout(grafico_config)
+    fig_spectrogram.update_yaxes(zeroline=False, type='log',
+                                 tickvals=freq_ticks, ticktext=freq_ticks)
+
     return fig_spectrogram
 
 
 # Função para plotar gráfico do SPL
-def create_spl_figure(frequencies, magnitude_db_relative, name, color):
+def create_spl_figure(freq, mean_spl_db, name, color):
     fig_spl = px.line(log_x=True, title='Espectro de Potência',
                       labels={'x': 'Frequência (Hz)', 'y': 'Magnitude (dB Relative)'})
-    fig_spl.add_trace(go.Scatter(x=frequencies, y=magnitude_db_relative, mode='lines', name=name, line=dict(color=color)))
+    fig_spl.add_trace(go.Scatter(x=freq, y=mean_spl_db, mode='lines', name=name, line=dict(color=color)))
     fig_spl.update_xaxes(range=[np.log10(20), np.log10(20000)],
                          tickvals=freq_ticks, ticktext=freq_ticks,
                          gridcolor='rgba(255, 255, 255, 0.04)')
-    fig_spl.update_yaxes(gridcolor='rgba(255, 255, 255, 0.04)')
-    fig_spl.update_layout(grafico_config, yaxis_range=[-120, 0])
+    fig_spl.update_yaxes(gridcolor='rgba(255, 255, 255, 0.04)', zeroline=False)
+    fig_spl.update_layout(grafico_config)
     return fig_spl
 
 
@@ -103,6 +120,7 @@ def update_graphs(selected_file, ir_contents, ir_filename):
     audio, sr = None, None
     fig_spectrogram = go.Figure()
     fig_spl = px.line()
+    fig_combined = go.Figure()
     audio_src, ir_audio_src = None, None
 
     audioinfo_children = html.Div([html.P('No audio selected')], className='looper-div')
@@ -113,8 +131,8 @@ def update_graphs(selected_file, ir_contents, ir_filename):
         audio, sr = load_audio(filepath)
 
         if audio is not None:
+
             duration = librosa.get_duration(y=audio, sr=sr)
-            fig_spectrogram = create_spectrogram_figure(audio, sr)
 
             audioinfo_children = html.Div([
                 html.P(f'Sample Rate: {sr} Hz'),
@@ -123,8 +141,9 @@ def update_graphs(selected_file, ir_contents, ir_filename):
 
             audio_src = audio_to_base64(audio, sr)
 
-            frequencies, magnitude_db_relative, magnitude_db_normal = calculate_db(audio, sr)
-            fig_spl = create_spl_figure(frequencies, magnitude_db_relative, 'SPL Original', '#FF5C00')
+            freq, mean_spl_db, stft, magnitude_db, time, sr = calculate_db(filepath, sr)
+            fig_spl = create_spl_figure(freq, mean_spl_db, 'SPL Original', '#FF5C00')
+            fig_spectrogram = create_spectrogram_figure(magnitude_db, freq, time)
 
     if ir_contents and audio is not None:  # Process IR only if audio is loaded
         content_type, content_string = ir_contents.split(',')
@@ -134,13 +153,14 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             ir, sr_ir = librosa.load(io.BytesIO(decoded))
             if sr != sr_ir:
                 ir = librosa.resample(ir, orig_sr=sr_ir, target_sr=sr)
+                print(f"Nova taxa de amostragem do IR: {sr}")
 
             audio_ir = convolve(audio, ir, mode='same')
             audio_ir /= np.abs(audio_ir).max()
             audio /= np.abs(audio).max()
 
-            frequencies_ir, magnitude_db_relative_ir, magnitude_db_normal_ir = calculate_db(audio_ir, sr)
-            fig_spl.add_trace(go.Scatter(x=frequencies_ir, y=magnitude_db_relative_ir,
+            freq_ir, mean_spl_db_ir, stft_ir, magnitude_db_ir, time_ir, sr_ir = calculate_db(audio_ir, sr)
+            fig_spl.add_trace(go.Scatter(x=freq_ir, y=mean_spl_db_ir,
                                          mode='lines', name='SPL com IR', line=dict(color='#FFDF00')))
 
             irinfo_children = html.Div([
@@ -151,7 +171,9 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             ir_audio_src = audio_to_base64(audio_ir, sr)
 
         except Exception as e:
-            print(f'Error loading or processing IR: {e}')
+            print(f"Erro completo no carregamento/processamento do IR: {e}")  # Mais detalhes!
+            import traceback
+            traceback.print_exc()  # Imprime o traceback completo do erro
 
     return fig_spectrogram, fig_spl, audioinfo_children, irinfo_children, audio_src, ir_audio_src
 
