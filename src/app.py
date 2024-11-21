@@ -12,8 +12,12 @@ from scipy.signal import convolve
 import dash_bootstrap_components as dbc
 import soundfile as sf
 from pathlib import Path
+from functools import lru_cache
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/style.css'])
+
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/style.css'],
+                suppress_callback_exceptions=True)
+app.title = 'the_bassIR'
 server = app.server
 
 # Diretório dos arquivos de áudio
@@ -58,6 +62,7 @@ def calculate_db(audio_data_or_filepath, sr, calibration_factor=1.0):
 
 
 # Função para carregamento dos áudios
+@lru_cache(maxsize=32)
 def load_audio(filepath):
     try:
         audio, sr = librosa.load(filepath)
@@ -123,7 +128,6 @@ def update_graphs(selected_file, ir_contents, ir_filename):
     audio, sr = None, None
     fig_spectrogram = go.Figure()
     fig_spl = px.line()
-    fig_combined = go.Figure()
     audio_src, ir_audio_src = None, None
 
     audioinfo_children = html.Div([html.P('No audio selected')], className='looper-div')
@@ -144,7 +148,7 @@ def update_graphs(selected_file, ir_contents, ir_filename):
 
             audio_src = audio_to_base64(audio, sr)
 
-            freq, mean_spl_db, stft, magnitude_db, time, sr = calculate_db(filepath, sr)
+            freq, mean_spl_db, stft, magnitude_db, time, sr = calculate_db(audio, sr)
             fig_spl = create_spl_figure(freq, mean_spl_db, 'SPL Original', '#FF5C00')
             fig_spectrogram = create_spectrogram_figure(magnitude_db, freq, time)
 
@@ -198,8 +202,8 @@ titulo = html.H1(children='The_bassIR', className='audio-info'),
 
 dropaudio = dcc.Dropdown(
     id='audio-dropdown',
-    options=[{'label': f.name, 'value': f.name} for f in AUDIO_DIR.iterdir()
-                if f.is_file() and f.suffix in ['.wav', '.mp3']],
+    options=[{'label': f.name, 'value': f.name} for f in AUDIO_DIR.iterdir() if f.is_file() and
+             f.suffix in ['.wav', '.mp3']],
     value=None,
     placeholder='Selecione um arquivo de áudio',
     className='dropdown',
@@ -294,7 +298,8 @@ linha_graficos = html.Div(id='graphs-container', children=[
     dbc.Row([
         dbc.Col(
             dcc.Loading(
-                grafico_spl, color='#d3d3d3',
+                    grafico_spl,
+                    color="#d3d3d3", type="dot", fullscreen=False
             ),
         )
     ]),
@@ -302,8 +307,9 @@ linha_graficos = html.Div(id='graphs-container', children=[
     dbc.Row([
         dbc.Col(
             dcc.Loading(
-                grafico_spectrogram, color='#d3d3d3',
-            ),
+                    grafico_spectrogram,
+                    color="#d3d3d3", type="dot", fullscreen=False
+            )
         )
     ]),
 ], style={'display': 'none'})
