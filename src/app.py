@@ -12,16 +12,23 @@ from scipy.signal import convolve
 import dash_bootstrap_components as dbc
 import soundfile as sf
 from pathlib import Path
-from functools import lru_cache
-
+from flask_caching import Cache
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/style.css'],
                 suppress_callback_exceptions=True)
 app.title = 'the_bassIR'
 server = app.server
 
+cache = Cache(app.server, config={'CACHE_TYPE': 'filesystem',
+                                  'CACHE_DIR': 'cache_dir'})
+TIMEOUT = 20
+
 # Diretório dos arquivos de áudio
 AUDIO_DIR = Path(__file__).parent / 'basslines'
+
+# Opções de audio no dropdown
+basslines = [{'label': f.name, 'value': f.name} for f in AUDIO_DIR.iterdir() if f.is_file() and
+             f.suffix in ['.wav', '.mp3']]
 
 # Labels para as frequências
 freq_ticks = [20, 50, 70, 100, 150, 250, 500, 1000, 1500, 2000, 3000, 5000, 10000, 15000, 20000]
@@ -37,10 +44,11 @@ grafico_config = {
 
 
 # Função para cálculo das variáveis do áudio
+@cache.memoize(timeout=TIMEOUT)
 def calculate_db(audio_data_or_filepath, sr, calibration_factor=1.0):
-    if isinstance(audio_data_or_filepath, str):  # Verifica se é um caminho de arquivo
+    if isinstance(audio_data_or_filepath, str):
         y, sr = librosa.load(audio_data_or_filepath)
-    elif isinstance(audio_data_or_filepath, np.ndarray):  # Verifica se são dados de áudio
+    elif isinstance(audio_data_or_filepath, np.ndarray):
         y = audio_data_or_filepath
     else:
         raise TypeError("Entrada inválida. Deve ser um caminho de arquivo (str) ou dados de áudio (np.ndarray).")
@@ -62,7 +70,7 @@ def calculate_db(audio_data_or_filepath, sr, calibration_factor=1.0):
 
 
 # Função para carregamento dos áudios
-@lru_cache(maxsize=32)
+@cache.memoize(timeout=TIMEOUT)
 def load_audio(filepath):
     try:
         audio, sr = librosa.load(filepath)
@@ -80,6 +88,7 @@ def create_spectrogram_figure(magnitude_db, freq, time):
                                 aspect='auto', origin='lower',
                                 labels=dict(x="Tempo (s)", y="Frequência (Hz)", color="Magnitude (dB)"),
                                 )
+
     fig_spectrogram.update_layout(grafico_config,
                                   xaxis_title='Tempo (s)', yaxis_title='Frequências (Hz)')
     fig_spectrogram.update_yaxes(zeroline=False, type='log',
@@ -104,6 +113,7 @@ def create_spl_figure(freq, mean_spl_db, name, color):
 
 
 # Função para decodificação do áudio
+@cache.memoize(timeout=TIMEOUT)
 def audio_to_base64(audio, sr):
     audio_bytes = io.BytesIO()
     sf.write(audio_bytes, audio, sr, format='WAV')
@@ -123,6 +133,7 @@ def audio_to_base64(audio, sr):
     Input('audio-dropdown', 'value'),
     Input('upload-ir', 'contents'),
     State('upload-ir', 'filename'),
+    prevent_initial_call=True,
 )
 def update_graphs(selected_file, ir_contents, ir_filename):
     audio, sr = None, None
@@ -152,7 +163,7 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             fig_spl = create_spl_figure(freq, mean_spl_db, 'SPL Original', '#FF5C00')
             fig_spectrogram = create_spectrogram_figure(magnitude_db, freq, time)
 
-    if ir_contents and audio is not None:  # Process IR only if audio is loaded
+    if ir_contents and audio is not None:
         content_type, content_string = ir_contents.split(',')
         decoded = base64.b64decode(content_string)
 
@@ -178,9 +189,9 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             ir_audio_src = audio_to_base64(audio_ir, sr)
 
         except Exception as e:
-            print(f"Erro completo no carregamento/processamento do IR: {e}")  # Mais detalhes!
+            print(f"Erro completo no carregamento/processamento do IR: {e}")
             import traceback
-            traceback.print_exc()  # Imprime o traceback completo do erro
+            traceback.print_exc()
 
     return fig_spectrogram, fig_spl, audioinfo_children, irinfo_children, audio_src, ir_audio_src
 
@@ -202,8 +213,7 @@ titulo = html.H1(children='The_bassIR', className='audio-info'),
 
 dropaudio = dcc.Dropdown(
     id='audio-dropdown',
-    options=[{'label': f.name, 'value': f.name} for f in AUDIO_DIR.iterdir() if f.is_file() and
-             f.suffix in ['.wav', '.mp3']],
+    options=basslines,
     value=None,
     placeholder='Selecione um arquivo de áudio',
     className='dropdown',
