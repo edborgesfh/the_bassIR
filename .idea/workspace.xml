@@ -4,37 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="'novos requerimentos'">
+    <list default="true" id="eb59f021-8178-43a6-a82c-bfaf10d71adc" name="Changes" comment="'atualizações'">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/039fc2981213b9e376edc4f4357d3fce" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/0555dc76b39051277864598f76144541" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/06fd1b290997709a25b7b6ad866dae2d" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/07b6fff6127feed1401e7e2b72eba22f" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/10dfdd748aab1be2a5a740c09346d2b2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/136c3f2b9b4543eb19aeecc7930aea60" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/15f1cd22ae44e6df38ddc57fc8941cce" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/1797bc1fce6b56118844fe6d107a77af" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/2029240f6d1128be89ddc32729463129" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/4d39c63555063affa38a70447ed92c01" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/51755151704737b47309c6690d3f81e5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/683260ac4b98c8dd7bc9acad55063892" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/8841fdc2fbdd6dfb5c9c0771c2e62396" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/8a3985f84fa48477b8b21c5f7fbfcd43" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/8c8540f5b6ab5932f5b93ec00802dcd0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/90ae01e351f3e9c89536bc8a927459d7" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/926f0199f35e91bebf65fb1aa0f2ffad" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/a0787f960f8bf54d04bf354cebd702f1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/a93d2e9a2a83d3c3fb10fc92b936bc36" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/aa01a0f485a0e975ed8640f75f0cc55b" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/afdb247c78a63c5542140cd0d2681e28" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/b821b1680905831d5be523632ea097b8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/d12facab91eb302533d2b3fb191492a8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/d4874f4302f7ccde2c568642d57a6e6e" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/e132004f8ccc6395c53039ef0c916d0f" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/e450d561437c2f8709f2378558286da8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/f7d64dfca51a2d8b7acbcdab678b0c7d" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache_dir/ffaceb0d713d6d8e920ca0ea8baa76a6" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,27 +42,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Python.alternativa.executor&quot;: &quot;Run&quot;,
-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
-    &quot;Python.app_performance_test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.app_st.executor&quot;: &quot;Run&quot;,
-    &quot;Python.audioplayer.executor&quot;: &quot;Run&quot;,
-    &quot;Python.audioplayer_teste.executor&quot;: &quot;Run&quot;,
-    &quot;Python.freqan.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.outra.executor&quot;: &quot;Run&quot;,
-    &quot;Python.outro_audioplayer_teste.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Eduardo Borges Filho/PycharmProjects/the_bassIR&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Python.alternativa.executor": "Run",
+    "Python.app.executor": "Debug",
+    "Python.app_performance_test.executor": "Run",
+    "Python.app_st.executor": "Run",
+    "Python.audioplayer.executor": "Run",
+    "Python.audioplayer_teste.executor": "Run",
+    "Python.freqan.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.outra.executor": "Run",
+    "Python.outro_audioplayer_teste.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/Eduardo Borges Filho/PycharmProjects/the_bassIR",
+    "settings.editor.selected.configurable": "project.propDebugger"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR" />
@@ -115,7 +88,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\Eduardo Borges Filho\PycharmProjects\the_bassIR\src\app.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/app.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -341,7 +314,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732208940822</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="'atualizações'">
+      <option name="closed" value="true" />
+      <created>1732285006460</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1732285006461</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -364,6 +345,7 @@
     <MESSAGE value="'adaptações para diferentes telas'" />
     <MESSAGE value="'tentativas de melhoria de desempenho'" />
     <MESSAGE value="'novos requerimentos'" />
-    <option name="LAST_COMMIT_MESSAGE" value="'novos requerimentos'" />
+    <MESSAGE value="'atualizações'" />
+    <option name="LAST_COMMIT_MESSAGE" value="'atualizações'" />
   </component>
 </project>

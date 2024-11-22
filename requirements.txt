@@ -8,4 +8,3 @@ librosa~=0.10.2.post1
 scipy~=1.14.1
 soundfile~=0.12.1
 dash-bootstrap-components
-flask-caching

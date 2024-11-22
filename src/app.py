@@ -128,34 +128,35 @@ server = app.server
     prevent_initial_call=True,
 )
 def update_graphs(selected_file, ir_contents, ir_filename):
-    audio, sr = None, None
     fig_spectrogram = go.Figure()
     fig_spl = px.line()
-    audio_src, ir_audio_src = None, None
-
     audioinfo_children = html.Div([html.P('No audio selected')], className='looper-div')
     irinfo_children = html.Div([html.P('No IR uploaded')], className='irloader-div')
+    audio_src, ir_audio_src = None, None
 
-    if selected_file:
-        filepath = os.path.join(AUDIO_DIR, selected_file)
+    if not selected_file:
+        return fig_spectrogram, fig_spl, audioinfo_children, irinfo_children, audio_src, ir_audio_src
+
+    filepath = os.path.join(AUDIO_DIR, selected_file)
+    try:
         audio, sr = load_audio(filepath)
+    except Exception as e:
+        print(f"Erro ao carregar o áudio: {e}")
+        audioinfo_children = html.Div([html.P(f"Erro ao carregar: {selected_file}")], className='looper-div')
+        return fig_spectrogram, fig_spl, audioinfo_children, irinfo_children, audio_src, ir_audio_src
 
-        if audio is not None:
+    duration = librosa.get_duration(y=audio, sr=sr)
+    audioinfo_children = html.Div([
+        html.P(f'Sample Rate: {sr} Hz'),
+        html.P(f'Duração: {duration:.2f} sec')
+    ], className='looper-div')
+    audio_src = audio_to_base64(audio, sr)
 
-            duration = librosa.get_duration(y=audio, sr=sr)
+    freq, mean_spl_db, stft, magnitude_db, time, _ = calculate_db(audio, sr)
+    fig_spl = create_spl_figure(freq, mean_spl_db, 'SPL Original', '#FF5C00')
+    fig_spectrogram = create_spectrogram_figure(magnitude_db, freq, time)
 
-            audioinfo_children = html.Div([
-                html.P(f'Sample Rate: {sr} Hz'),
-                html.P(f'Duração: {duration:.2f} sec')
-            ], className='looper-div')
-
-            audio_src = audio_to_base64(audio, sr)
-
-            freq, mean_spl_db, stft, magnitude_db, time, sr = calculate_db(audio, sr)
-            fig_spl = create_spl_figure(freq, mean_spl_db, 'SPL Original', '#FF5C00')
-            fig_spectrogram = create_spectrogram_figure(magnitude_db, freq, time)
-
-    if ir_contents and audio is not None:
+    if ir_contents:
         content_type, content_string = ir_contents.split(',')
         decoded = base64.b64decode(content_string)
 
@@ -163,13 +164,12 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             ir, sr_ir = librosa.load(io.BytesIO(decoded))
             if sr != sr_ir:
                 ir = librosa.resample(ir, orig_sr=sr_ir, target_sr=sr)
-                print(f"Nova taxa de amostragem do IR: {sr}")
 
-            audio_ir = convolve(audio, ir, mode='same')
+            # Normalização mais eficiente
+            audio_ir = convolve(audio / np.abs(audio).max(), ir, mode='same')
             audio_ir /= np.abs(audio_ir).max()
-            audio /= np.abs(audio).max()
 
-            freq_ir, mean_spl_db_ir, stft_ir, magnitude_db_ir, time_ir, sr_ir = calculate_db(audio_ir, sr)
+            freq_ir, mean_spl_db_ir, _, _, _, _ = calculate_db(audio_ir, sr)
             fig_spl.add_trace(go.Scatter(x=freq_ir, y=mean_spl_db_ir,
                                          mode='lines', name='SPL com IR', line=dict(color='#FFDF00')))
 
@@ -181,9 +181,10 @@ def update_graphs(selected_file, ir_contents, ir_filename):
             ir_audio_src = audio_to_base64(audio_ir, sr)
 
         except Exception as e:
-            print(f"Erro completo no carregamento/processamento do IR: {e}")
+            print(f"Erro no carregamento/processamento do IR: {e}")
             import traceback
             traceback.print_exc()
+            irinfo_children = html.Div([html.P(f"Erro no IR: {ir_filename}")], className='irloader-div')
 
     return fig_spectrogram, fig_spl, audioinfo_children, irinfo_children, audio_src, ir_audio_src
 
@@ -191,13 +192,14 @@ def update_graphs(selected_file, ir_contents, ir_filename):
 # Callback para mostrar/esconder gráficos
 @app.callback(
     Output('graphs-container', 'style'),
+    Output('pedal-irloader', 'style'),
     Input('audio-dropdown', 'value')
 )
 def show_graphs(selected_file):
     if selected_file:
-        return {'display': 'block'}  # Mostra os gráficos
+        return {'display': 'block'}, {'display': 'block'}  # Mostra os gráficos
     else:
-        return {'display': 'none'}   # Esconde os gráficos
+        return {'display': 'none'}, {'display': 'none'}   # Esconde os gráficos
 
 
 # Elementos do layout
@@ -267,7 +269,7 @@ pedal_looper = dbc.Card([
     ]),
 ], className='loop-cardbody'),
 
-pedal_irloader = dbc.Card([
+pedal_irloader = dbc.Card(id='pedal-irloader', children=[
     dbc.CardBody([
         dbc.Row([
             dbc.Col([
@@ -283,7 +285,7 @@ pedal_irloader = dbc.Card([
             ]),
         ]),
     ]),
-], className='irloader-cardbody'),
+], className='irloader-cardbody', style={'display': 'none'}),
 
 
 # Linhas
