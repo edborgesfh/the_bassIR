@@ -12,16 +12,6 @@ from scipy.signal import convolve
 import dash_bootstrap_components as dbc
 import soundfile as sf
 from pathlib import Path
-from flask_caching import Cache
-
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, 'src/assets/style.css'],
-                suppress_callback_exceptions=True)
-app.title = 'the_bassIR'
-server = app.server
-
-cache = Cache(app.server, config={'CACHE_TYPE': 'filesystem',
-                                  'CACHE_DIR': 'cache_dir'})
-TIMEOUT = 20
 
 # Diretório dos arquivos de áudio
 AUDIO_DIR = Path(__file__).parent / 'basslines'
@@ -44,7 +34,6 @@ grafico_config = {
 
 
 # Função para cálculo das variáveis do áudio
-@cache.memoize(timeout=TIMEOUT)
 def calculate_db(audio_data_or_filepath, sr, calibration_factor=1.0):
     if isinstance(audio_data_or_filepath, str):
         y, sr = librosa.load(audio_data_or_filepath)
@@ -70,7 +59,6 @@ def calculate_db(audio_data_or_filepath, sr, calibration_factor=1.0):
 
 
 # Função para carregamento dos áudios
-@cache.memoize(timeout=TIMEOUT)
 def load_audio(filepath):
     try:
         audio, sr = librosa.load(filepath)
@@ -88,7 +76,6 @@ def create_spectrogram_figure(magnitude_db, freq, time):
                                 aspect='auto', origin='lower',
                                 labels=dict(x="Tempo (s)", y="Frequência (Hz)", color="Magnitude (dB)"),
                                 )
-
     fig_spectrogram.update_layout(grafico_config,
                                   xaxis_title='Tempo (s)', yaxis_title='Frequências (Hz)')
     fig_spectrogram.update_yaxes(zeroline=False, type='log',
@@ -113,13 +100,18 @@ def create_spl_figure(freq, mean_spl_db, name, color):
 
 
 # Função para decodificação do áudio
-@cache.memoize(timeout=TIMEOUT)
 def audio_to_base64(audio, sr):
     audio_bytes = io.BytesIO()
     sf.write(audio_bytes, audio, sr, format='WAV')
     audio_bytes.seek(0)
     audio_base64 = base64.b64encode(audio_bytes.read()).decode('ascii')
     return f'data:audio/wav;base64,{audio_base64}'
+
+
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY],
+                suppress_callback_exceptions=True)
+app.title = 'the_bassIR'
+server = app.server
 
 
 # Callback principal
@@ -219,7 +211,7 @@ dropaudio = dcc.Dropdown(
     className='dropdown',
 )
 
-audioinfo = html.Div(id='audioinfo')
+audioinfo = html.Div([html.P('Sem áudio')], className='looper-div', id='audioinfo')
 
 audio_player = html.Div([
     html.Audio(id='audio-player', controls=True, className='audio-looper'),
@@ -233,7 +225,7 @@ irloader = dcc.Upload(
     multiple=False
 ),
 
-irinfo = html.Div(id='irinfo')
+irinfo = html.Div([html.P('Sem IR')], className='irloader-div', id='irinfo')
 
 ir_audio_player = html.Div([
     html.Audio(id='ir-audio-player', controls=True, className='audio-irloader'),
